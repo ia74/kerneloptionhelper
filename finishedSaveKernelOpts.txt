@@ -1,0 +1,1 @@
+acpi_backlight=video root=/dev/disk/by-label/arch initrd=\initramfs-linux.img rw rd.udev.log_level=3 systemd.show_status=auto nvidia_drm.fbdev=1 nvidia_drm.modeset=1 i915.modeset=1 vt.global_cursor_default=0 quiet loglevel=3 

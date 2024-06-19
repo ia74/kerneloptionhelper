@@ -1,0 +1,81 @@
+###################################################################
+### Variables allow you to swap any parameter quick and easily. ###
+###################################################################
+$kernel=linux # vmlinuz-(kernel) and initramfs-(kernel) setters
+$arch_root=/dev/disk/by-label/arch
+#$arch_root=%0000000-FFFF-FFFF-FFFF # % is short for "UUID=" (replace with real UUID from blkid)
+$efi_disk=/dev/nvme0n1
+$efi_part=1
+
+
+### SECTIONS:
+# Any section beginning with @ is a special section - has special definitions
+# Only exists for @efi, @settings, @root, and @logging.
+# The special sections mainly exist for visual clarity.
+
+########################################################
+### This is what your EFI boot entry will look like. ###
+########################################################
+@efi {
+  number = 0000 # efibootmgr entry: Boot0000, Boot0001, etc.
+  title = "I use arch BTW" # The actual title of the entry.
+  loader = /vmlinuz-$kernel # The kernel loader.
+  efi_disk = $efi_disk # The specific disk where your EFI partition is.
+  efi_partition = $efi_part # The actual partition where your ESP/EFI is stored.
+}
+
+#####################################
+### This is the settings for KOH. ###
+#####################################
+@settings {
+  options_file = finishedSaveKernelOpts.txt # Where you want to store the finished options file, delimited by ;.
+}
+
+######################################################################################
+### These are special settings for logging.                                        ###
+### If you do not want to use them, just replace 'level' with 'loglevel' in @root. ###
+### 'quiet' carries over as usual.                                                 ###
+######################################################################################
+@logging {
+    use = quiet, # Commas are optional and are removed at interpretation time unless escaped with \,
+    level = 3,
+}
+
+########################################################################################
+### Much like @settings, @root allows you to set parameters that don't have a module ###
+########################################################################################
+@root {
+  acpi_backlight=video
+  root = $arch_root # This is where your system root partition/block identifier should be.
+  initrd=\initramfs-$kernel.img # This is your initial ramdisk
+  use = rw # Set the partition mode to read/write
+  # splash # Use splash, for plymouth
+}
+
+# rd.udev { # Alternative way to call rd.udev
+#   log_level = 3
+# }
+#
+
+rd { # But this is the cooler way of calling rd.udev
+    udev {
+        log_level=3
+    }
+}
+
+systemd {
+    show_status=auto
+}
+
+nvidia_drm {
+  fbdev = 1
+  modeset = 1
+}
+
+i915 {
+    modeset = 1
+}
+
+vt {
+    global_cursor_default = 0
+}
