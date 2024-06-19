@@ -1,0 +1,56 @@
+# For those who already know what they're doing.
+
+$kernel=linux
+$arch_root=/dev/disk/by-label/arch
+#$arch_root=%0000000-FFFF-FFFF-FFFF
+$efi_disk=/dev/nvme0n1
+$efi_part=1
+
+@efi {
+  number = 0000 
+  title = "I use arch BTW" 
+  loader = /vmlinuz-$kernel 
+  efi_disk = $efi_disk 
+  efi_partition = $efi_part 
+}
+
+@settings {
+  options_file = finishedSaveKernelOpts.txt 
+}
+
+@logging {
+    use = quiet, # Commas are optional and are removed at interpretation time unless escaped with \,
+    level = 3,
+}
+
+@root {
+  acpi_backlight=video
+  root = $arch_root # This is where your system root partition/block identifier should be.
+  initrd=\initramfs-$kernel.img # This is your initial ramdisk
+  use = rw # Set the partition mode to read/write
+  # splash # Use splash, for plymouth
+}
+
+
+rd { 
+    udev {
+        log_level=3
+    }
+}
+
+systemd {
+    show_status=auto
+}
+
+nvidia_drm {
+  fbdev = 1
+  modeset = 1
+}
+
+i915 {
+    modeset = 1
+}
+
+vt {
+    global_cursor_default = 0
+}
